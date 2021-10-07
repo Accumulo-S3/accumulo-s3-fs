@@ -47,11 +47,12 @@ import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.client.admin.DiskUsage;
 import org.apache.accumulo.core.client.admin.TableOperations;
 import org.apache.accumulo.core.conf.Property;
+import org.apache.accumulo.core.constraints.DefaultKeySizeConstraint;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.PartialKey;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.data.constraints.DefaultKeySizeConstraint;
+//import org.apache.accumulo.core.data.
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.TablePermission;
 import org.apache.commons.lang3.StringUtils;
@@ -70,11 +71,9 @@ public class TableOperationsIT {
 
   @Before
   public void setup() {
-    System.out.println("setting up env...");
-    URL clientPropUrl =
-        AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
-    accumuloClient = Accumulo.newClient().from(clientPropUrl).build();
-    System.out.println("setup complete...");
+//    URL clientPropUrl =
+//        AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
+    accumuloClient = Accumulo.newClient().from("accumulo-client.properties").build();
   }
 
   @After
@@ -168,7 +167,7 @@ public class TableOperationsIT {
       AccumuloSecurityException, TableNotFoundException {
     String tableName = "createTable1";// getUniqueNames(1)[0];
     accumuloClient.tableOperations().create(tableName);
-    Map<String,String> props = accumuloClient.tableOperations().getConfiguration(tableName);
+    Map<String,String> props = accumuloClient.tableOperations().getSamplerConfiguration(tableName).getOptions();
     assertEquals(DefaultKeySizeConstraint.class.getName(),
         props.get(Property.TABLE_CONSTRAINT_PREFIX + "1"));
     accumuloClient.tableOperations().delete(tableName);

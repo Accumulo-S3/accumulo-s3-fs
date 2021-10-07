@@ -53,8 +53,9 @@ public class AccumuloClientIT {
   private static final String USER2_PRINCIPAL = "user2";
   private static final String USER2_PASSWD = "passwd2";
 
-  public static URL clientPropUrl =
-      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
+//  public final static URL clientPropUrl =
+//      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
+  public final static String clientPropUrl = "accumulo-client.properties";
 
   @After
   public void deleteUsers() throws Exception {
@@ -107,9 +108,9 @@ public class AccumuloClientIT {
 
       c.tableOperations().create(tableName);
 
-      try (AccumuloClient client2 = org.apache.accumulo.core.client.Connector.newClient(c)) {
-        assertTrue(client2.tableOperations().list().contains(tableName));
-      }
+//      try (AccumuloClient client2 = org.apache.accumulo.core.client.Connector.newClient(c)) {
+//        assertTrue(client2.tableOperations().list().contains(tableName));
+//      }
 
       // closing client2 should not have had an impact on the connector or client1
       assertTrue(client1.tableOperations().list().contains(tableName));
@@ -231,7 +232,7 @@ public class AccumuloClientIT {
     assertEquals(0, SingletonManager.getReservationCount());
 
     expectClosed(() -> c.createScanner(tableName, Authorizations.EMPTY));
-    expectClosed(() -> c.createConditionalWriter(tableName));
+    expectClosed(() -> c.createConditionalWriter(tableName, null));
     expectClosed(() -> c.createBatchWriter(tableName));
     expectClosed(c::tableOperations);
     expectClosed(c::instanceOperations);

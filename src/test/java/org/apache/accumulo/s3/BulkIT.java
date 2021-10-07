@@ -52,8 +52,9 @@ import com.amazonaws.services.s3.model.CreateBucketRequest;
  */
 public class BulkIT {
   private static final String bucketName = "accumulo.s3";
-  public static URL clientPropUrl =
-      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
+  public static String clientPropUrl = "accumulo-client.properties";
+//  public static URL clientPropUrl =
+//      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
   private static final Path bulkIngestNewBaseDir = new Path("bulkImportTestNew");
   private static final Path bulkIngestOldBaseDir = new Path("bulkImportTestOld");
   private static final FileSystem fs = new AccumuloNoFlushS3FileSystem();
@@ -64,10 +65,6 @@ public class BulkIT {
 
   protected int defaultTimeoutSeconds() {
     return 4 * 60;
-  }
-
-  public static void main(String[] args) {
-    AccumuloClient client = Accumulo.newClient().from(clientPropUrl).build();
   }
 
   @Before
@@ -165,20 +162,14 @@ public class BulkIT {
   private static void bulkLoad(AccumuloClient c, String tableName, Path bulkFailures, Path files,
       boolean useOld)
       throws TableNotFoundException, IOException, AccumuloException, AccumuloSecurityException {
-    System.out.println("failures: " + bulkFailures.toString());
-    System.out.println("files: " + files.toString());
     // Make sure the server can modify the files
     if (useOld) {
       c.tableOperations().importDirectory(tableName, files.toString(), bulkFailures.toString(),
           false);
-      System.out.println("1");
     } else {
-      System.out.println("2");
       // not appending the 'ignoreEmptyDir' method defaults to not ignoring empty directories.
       c.tableOperations().importDirectory(files.toString()).to(tableName).load();
-      System.out.println("3");
       try {
-        System.out.println("4");
         // if run again, the expected IllegalArgrumentException is thrown
         c.tableOperations().importDirectory(files.toString()).to(tableName).load();
       } catch (IllegalArgumentException ex) {
@@ -186,19 +177,16 @@ public class BulkIT {
       }
       // re-run using the ignoreEmptyDir option and no error should be thrown since empty
       // directories will be ignored
-      System.out.println("5");
-      c.tableOperations().importDirectory(files.toString()).to(tableName).ignoreEmptyDir(true)
-          .load();
-      System.out.println("6");
-      try {
-        System.out.println("7");
-        // setting ignoreEmptyDir to false, explicitly, results in exception being thrown again.
-        c.tableOperations().importDirectory(files.toString()).to(tableName).ignoreEmptyDir(false)
-            .load();
-        System.out.println("8");
-      } catch (IllegalArgumentException ex) {
-        // expected exception to be thrown
-      }
+      // TODO add ignore empty tests back in version 2.1.0
+//      c.tableOperations().importDirectory(files.toString()).to(tableName).ignoreEmptyDir(true)
+//          .load();
+//      try {
+//        // setting ignoreEmptyDir to false, explicitly, results in exception being thrown again.
+//        c.tableOperations().importDirectory(files.toString()).to(tableName).ignoreEmptyDir(false)
+//            .load();
+//      } catch (IllegalArgumentException ex) {
+//        // expected exception to be thrown
+//      }
     }
   }
 }
