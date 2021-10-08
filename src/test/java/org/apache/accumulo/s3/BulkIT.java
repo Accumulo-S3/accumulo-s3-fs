@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+import com.amazonaws.services.s3.model.Bucket;
 import org.apache.accumulo.core.client.Accumulo;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
@@ -52,9 +53,8 @@ import com.amazonaws.services.s3.model.CreateBucketRequest;
  */
 public class BulkIT {
   private static final String bucketName = "accumulo.s3";
-  public static String clientPropUrl = "accumulo-client.properties";
-//  public static URL clientPropUrl =
-//      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
+  public static URL clientPropUrl =
+      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
   private static final Path bulkIngestNewBaseDir = new Path("bulkImportTestNew");
   private static final Path bulkIngestOldBaseDir = new Path("bulkImportTestOld");
   private static final FileSystem fs = new AccumuloNoFlushS3FileSystem();
@@ -92,7 +92,7 @@ public class BulkIT {
 
   @Test
   public void test() throws Exception {
-    try (AccumuloClient client = Accumulo.newClient().from(clientPropUrl).build()) {
+    try (AccumuloClient client = Accumulo.newClient().from(clientPropUrl.getPath()).build()) {
       System.out
           .println(new Path(AccumuloNoFlushS3FileSystem.scheme + "://" + bucketName).toString());
       runTest(client, "testBulkImportNew", "s3", "new", false);
@@ -103,7 +103,7 @@ public class BulkIT {
 
   @Test
   public void testOld() throws Exception {
-    try (AccumuloClient client = Accumulo.newClient().from(clientPropUrl).build()) {
+    try (AccumuloClient client = Accumulo.newClient().from(clientPropUrl.getPath()).build()) {
       System.out
           .println(new Path(AccumuloNoFlushS3FileSystem.scheme + "://" + bucketName).toString());
       runTest(client, "testBulkImportOld", "s3", "old", true);

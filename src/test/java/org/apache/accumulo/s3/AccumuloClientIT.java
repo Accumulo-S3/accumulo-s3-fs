@@ -53,13 +53,12 @@ public class AccumuloClientIT {
   private static final String USER2_PRINCIPAL = "user2";
   private static final String USER2_PASSWD = "passwd2";
 
-//  public final static URL clientPropUrl =
-//      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
-  public final static String clientPropUrl = "accumulo-client.properties";
+  public final static URL clientPropUrl =
+      AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
 
   @After
   public void deleteUsers() throws Exception {
-    try (AccumuloClient client = Accumulo.newClient().from(clientPropUrl).build()) {
+    try (AccumuloClient client = Accumulo.newClient().from(clientPropUrl.getPath()).build()) {
       Set<String> users = client.securityOperations().listLocalUsers();
       if (users.contains(USER1_PRINCIPAL)) {
         client.securityOperations().dropLocalUser(USER1_PRINCIPAL);
@@ -86,7 +85,7 @@ public class AccumuloClientIT {
   @SuppressWarnings("deprecation")
   @Test
   public void testGetConnectorFromAccumuloClient() throws Exception {
-    AccumuloClient client = Accumulo.newClient().from(clientPropUrl).build();
+    AccumuloClient client = Accumulo.newClient().from(clientPropUrl.getPath()).build();
     org.apache.accumulo.core.client.Connector c =
         org.apache.accumulo.core.client.Connector.from(client);
     assertEquals(client.whoami(), c.whoami());
@@ -100,7 +99,7 @@ public class AccumuloClientIT {
   @SuppressWarnings("deprecation")
   @Test
   public void testGetAccumuloClientFromConnector() throws Exception {
-    try (AccumuloClient client1 = Accumulo.newClient().from(clientPropUrl).build()) {
+    try (AccumuloClient client1 = Accumulo.newClient().from(clientPropUrl.getPath()).build()) {
       org.apache.accumulo.core.client.Connector c =
           org.apache.accumulo.core.client.Connector.from(client1);
 
@@ -121,7 +120,7 @@ public class AccumuloClientIT {
 
   @Test
   public void testAccumuloClientBuilder() throws Exception {
-    AccumuloClient c = Accumulo.newClient().from(clientPropUrl).build();
+    AccumuloClient c = Accumulo.newClient().from(clientPropUrl.getPath()).build();
     String instanceName = c.properties().getProperty("instance.name");
     String zookeepers = c.properties().getProperty("instance.zookeepers");
 
@@ -193,7 +192,7 @@ public class AccumuloClientIT {
     assertEquals(0, SingletonManager.getReservationCount());
     assertEquals(Mode.CLIENT, SingletonManager.getMode());
 
-    try (AccumuloClient c = Accumulo.newClient().from(clientPropUrl).build()) {
+    try (AccumuloClient c = Accumulo.newClient().from(clientPropUrl.getPath()).build()) {
       assertEquals(1, SingletonManager.getReservationCount());
 
       c.tableOperations().create(tableName);
@@ -212,7 +211,7 @@ public class AccumuloClientIT {
 
     assertEquals(0, SingletonManager.getReservationCount());
 
-    AccumuloClient c = Accumulo.newClient().from(clientPropUrl).build();
+    AccumuloClient c = Accumulo.newClient().from(clientPropUrl.getPath()).build();
     assertEquals(1, SingletonManager.getReservationCount());
 
     // ensure client created after everything was closed works

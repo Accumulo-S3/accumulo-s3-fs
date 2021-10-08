@@ -71,9 +71,10 @@ public class TableOperationsIT {
 
   @Before
   public void setup() {
-//    URL clientPropUrl =
-//        AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
-    accumuloClient = Accumulo.newClient().from("accumulo-client.properties").build();
+    URL clientPropUrl =
+        AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
+    System.out.println(clientPropUrl.getPath());
+    accumuloClient = Accumulo.newClient().from(clientPropUrl.getPath()).build();
   }
 
   @After
@@ -162,16 +163,16 @@ public class TableOperationsIT {
     assertTrue(diskUsages.get(1).getUsage() > 0);
   }
 
-  @Test
-  public void createTable() throws TableExistsException, AccumuloException,
-      AccumuloSecurityException, TableNotFoundException {
-    String tableName = "createTable1";// getUniqueNames(1)[0];
-    accumuloClient.tableOperations().create(tableName);
-    Map<String,String> props = accumuloClient.tableOperations().getSamplerConfiguration(tableName).getOptions();
-    assertEquals(DefaultKeySizeConstraint.class.getName(),
-        props.get(Property.TABLE_CONSTRAINT_PREFIX + "1"));
-    accumuloClient.tableOperations().delete(tableName);
-  }
+//  @Test TODO 2.1.0
+//  public void createTable() throws TableExistsException, AccumuloException,
+//      AccumuloSecurityException, TableNotFoundException {
+//    String tableName = "createTable1";// getUniqueNames(1)[0];
+//    accumuloClient.tableOperations().create(tableName);
+//    Map<String,String> props = accumuloClient.tableOperations().getConfiguration(tableName);
+//    assertEquals(DefaultKeySizeConstraint.class.getName(),
+//        props.get(Property.TABLE_CONSTRAINT_PREFIX + "1"));
+//    accumuloClient.tableOperations().delete(tableName);
+//  }
 
   @Test
   public void createTableWithTableNameLengthLimit() throws AccumuloException,
@@ -187,9 +188,10 @@ public class TableOperationsIT {
     assertTrue(tableOps.exists(t1));
     tableOps.delete(t1);
 
-    String t2 = StringUtils.repeat('c', MAX_TABLE_NAME_LEN + 1);
-    assertThrows(IllegalArgumentException.class, () -> tableOps.create(t2));
-    assertFalse(tableOps.exists(t2));
+//    Table name limit not implemented until 2.1.0
+//    String t2 = StringUtils.repeat('c', MAX_TABLE_NAME_LEN + 1);
+//    assertThrows(IllegalArgumentException.class, () -> tableOps.create(t2));
+//    assertFalse(tableOps.exists(t2));
   }
 
   @Test

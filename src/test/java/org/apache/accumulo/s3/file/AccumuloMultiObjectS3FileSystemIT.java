@@ -52,13 +52,13 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
-public class AccumuloMultiObjectS3FileSystemTest extends MockS3TestBase {
+public class AccumuloMultiObjectS3FileSystemIT extends MockS3TestBase {
 
-  public AccumuloMultiObjectS3FileSystemTest() {
+  public AccumuloMultiObjectS3FileSystemIT() {
     super("accS3mo");
   }
 
-  @Test
+//  @Test
   public void testFSOperations() throws IOException {
 
     FileSystem fs = getFileSystem();
@@ -164,7 +164,7 @@ public class AccumuloMultiObjectS3FileSystemTest extends MockS3TestBase {
 
   }
 
-  @Test
+//  @Test
   public void testFlushingWithErrors() throws Exception {
     AtomicInteger counter = new AtomicInteger(0);
     // s3 = failTwiceWrapper(s3, counter);
@@ -226,7 +226,7 @@ public class AccumuloMultiObjectS3FileSystemTest extends MockS3TestBase {
     return amazonS3;
   }
 
-  @Test
+//  @Test
   public void testCreateWithNoClose() throws Exception {
     FileSystem fs = getFileSystem();
     Path testFile = new Path("createWithNoClose");
