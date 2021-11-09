@@ -119,7 +119,6 @@ public abstract class S3OutputStreamBase extends OutputStream implements Syncabl
   protected static long log(String message) {
     long nextMark = System.currentTimeMillis();
     long delta = nextMark - mark;
-    System.out.println("(+" + delta + ") " + message);
     mark = nextMark;
     return delta;
   }
