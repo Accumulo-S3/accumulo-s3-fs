@@ -24,7 +24,7 @@
   <groupId>org.apache.accumulo</groupId>
   <artifactId>accumulo-s3-fs</artifactId>
   <name>Accumulo S3 FileSystem</name>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>1.9.3-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
     <maven.compiler.release>11</maven.compiler.release>
