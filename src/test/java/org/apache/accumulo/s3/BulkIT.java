@@ -159,6 +159,7 @@ public class BulkIT {
     verifyParams.rows = 1;
     VerifyIngest.verifyIngest(c, verifyParams);
     c.tableOperations().delete(tableName);
+    fs.delete(base, true);
   }
 
   @SuppressWarnings("deprecation")
@@ -167,12 +168,10 @@ public class BulkIT {
       throws TableNotFoundException, IOException, AccumuloException, AccumuloSecurityException {
     // Make sure the server can modify the files
     if (useOld) {
-      LOG.warn(files.toString());
       c.tableOperations().importDirectory(tableName, files.toString(), bulkFailures.toString(),
           false);
     } else {
       // not appending the 'ignoreEmptyDir' method defaults to not ignoring empty directories.
-      LOG.warn(files.toString());
       c.tableOperations().importDirectory(files.toString()).to(tableName).load();
       try {
         // if run again, the expected IllegalArgrumentException is thrown
