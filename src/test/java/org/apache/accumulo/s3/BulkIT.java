@@ -172,7 +172,7 @@ public class BulkIT {
           false);
     } else {
       // not appending the 'ignoreEmptyDir' method defaults to not ignoring empty directories.
-
+      LOG.warn(files.toString());
       c.tableOperations().importDirectory(files.toString()).to(tableName).load();
       try {
         // if run again, the expected IllegalArgrumentException is thrown
