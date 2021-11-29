@@ -47,11 +47,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests Old and New Bulk import
  */
 public class BulkIT {
+  private static Logger LOG = LoggerFactory.getLogger(BulkIT.class);
   private static final String bucketName = "accumulo.s3";
   public static URL clientPropUrl =
       AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
@@ -164,10 +167,12 @@ public class BulkIT {
       throws TableNotFoundException, IOException, AccumuloException, AccumuloSecurityException {
     // Make sure the server can modify the files
     if (useOld) {
+      LOG.warn(files.toString());
       c.tableOperations().importDirectory(tableName, files.toString(), bulkFailures.toString(),
           false);
     } else {
       // not appending the 'ignoreEmptyDir' method defaults to not ignoring empty directories.
+
       c.tableOperations().importDirectory(files.toString()).to(tableName).load();
       try {
         // if run again, the expected IllegalArgrumentException is thrown
