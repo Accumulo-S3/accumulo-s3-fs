@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BulkIT {
   private static Logger LOG = LoggerFactory.getLogger(BulkIT.class);
-  private static final String bucketName = "accumulo.s3";
+  private static final String bucketName = "accumulo";
   public static URL clientPropUrl =
       AccumuloClient.class.getClassLoader().getResource("accumulo-client.properties");
   private static final Path bulkIngestNewBaseDir = new Path("bulkImportTestNew");
