@@ -154,13 +154,14 @@ public class TableOperationsIT {
 
     // verify tables have differences
     diskUsages = accumuloClient.tableOperations().getDiskUsage(tables);
-    accumuloClient.tableOperations().delete(tableName);
-    accumuloClient.tableOperations().create(tableName);
     assertEquals(2, diskUsages.size());
     assertEquals(1, diskUsages.get(0).getTables().size());
     assertEquals(1, diskUsages.get(1).getTables().size());
     assertTrue(diskUsages.get(0).getUsage() > 0);
     assertTrue(diskUsages.get(1).getUsage() > 0);
+
+    accumuloClient.tableOperations().delete(tableName);
+    accumuloClient.tableOperations().delete(newTable);
   }
 
 //  @Test TODO 2.1.0

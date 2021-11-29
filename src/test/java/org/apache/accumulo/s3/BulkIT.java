@@ -147,7 +147,6 @@ public class BulkIT {
     files = new Path(AccumuloNoFlushS3FileSystem.scheme + "://" + bucketName + "/", files);
     bulkLoad(c, tableName, bulkFailures, files, useOld);
     VerifyParams verifyParams = new VerifyParams(new Properties(), tableName, N);
-    c.tableOperations().delete(tableName);
     verifyParams.random = 56;
     for (int i = 0; i < COUNT; i++) {
       verifyParams.startRow = i * N;
@@ -156,6 +155,7 @@ public class BulkIT {
     verifyParams.startRow = N;
     verifyParams.rows = 1;
     VerifyIngest.verifyIngest(c, verifyParams);
+    c.tableOperations().delete(tableName);
   }
 
   @SuppressWarnings("deprecation")
