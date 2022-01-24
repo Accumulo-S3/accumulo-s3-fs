@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.amazonaws.client.builder.AwsClientBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -62,7 +63,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.common.annotations.VisibleForTesting;
 
 public abstract class AccumuloS3FileSystemBase extends FileSystem {
-  private static final Logger LOG = LoggerFactory.getLogger(AccumuloS3FileSystemBase.class);
+  private static final Logger log = LoggerFactory.getLogger(AccumuloS3FileSystemBase.class);
 
   private static final int S3_CONNECTION_TIMEOUT_MS = 1000;
   private static final int S3_REQUEST_TIMEOUT_MS = 30000;
@@ -76,6 +77,8 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   private static long blockSize = 1 << 30;
   protected String bucketName = null;
+  protected String endpoint = null;
+  protected String region = null;
   protected AmazonS3 s3Client;
   protected S3ClientWrapper s3 = null;
   protected Statistics stats = null;
@@ -88,6 +91,9 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public void initialize(URI name, Configuration conf) throws IOException {
+    endpoint = conf.get("fs.s3.endpoint", null);
+    region = conf.get("fs.s3.region", null);
+
     if (conf.getBoolean(USE_STATIC_CLIENT, false)) {
       s3Client = staticClient;
     } else {
@@ -99,7 +105,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   public void initialize(URI name, Configuration conf, AmazonS3 s3Client) throws IOException {
     setConf(conf);
-    LOG.trace("initializing with URI {}", name);
+    log.trace("initializing with URI {}", name);
     super.initialize(name, conf);
 
     s3 = new S3ClientWrapper(s3Client);
@@ -123,6 +129,15 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
                 .withConnectionTimeout(S3_CONNECTION_TIMEOUT_MS)
                 .withRequestTimeout(S3_REQUEST_TIMEOUT_MS).withSocketTimeout(S3_SOCKET_TIMEOUT_MS)
                 .withClientExecutionTimeout(S3_CLIENT_EXECUTION_TIMEOUT_MS));
+
+    // endpoint configured
+    if(this.region != null || this.endpoint != null) {
+      if(this.region == null || this.endpoint == null) {
+        log.error("Unable to configure S3 endpoint without both endpoint and region values. " +
+            "Configuration was endpoint [" + endpoint + "], region [" + region + "]");
+      }
+      builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region));
+    }
 
     return builder.build();
   }
@@ -160,7 +175,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public FileStatus getFileStatus(Path path) throws IOException {
-    LOG.trace("getFileStatus for {}", path);
+    log.trace("getFileStatus for {}", path);
     ObjectMetadata meta = s3.getObjectMetadata(bucketName, getObjectName(path));
     if (meta != null) {
       Date lastModifiedDate = meta.getLastModified();
@@ -181,7 +196,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
 
   @Override
   public boolean delete(Path path, boolean recursive) throws IOException {
-    LOG.trace("deleting {}, recursive={}", path, recursive);
+    log.trace("deleting {}, recursive={}", path, recursive);
     String objectName = getObjectName(path);
     if (recursive) {
       String marker = null;
@@ -321,7 +336,7 @@ public abstract class AccumuloS3FileSystemBase extends FileSystem {
           for (MultipartUpload upload : listing.getMultipartUploads()) {
             if (upload.getKey().equals(objectName)) {
               if (uploadId != null) {
-                LOG.warn("multiple upload sessions found for WAL {}", path);
+                log.warn("multiple upload sessions found for WAL {}", path);
               }
               uploadId = upload.getUploadId();
               closeMultipartUpload(objectName, uploadId);
